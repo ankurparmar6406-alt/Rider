@@ -1,44 +1,12 @@
-<body>
-
-<div class="card">
-
-<div style="font-size:80px;">🤖</div>
-
-<h1>RIDER AI</h1>
-
-<p id="status">Welcome Back, Boss</p>
-
-<button onclick="startRider()">
-🎤 Start Rider
-</button>
-
-<br><br>
-
-<input
-id="command"
-type="text"
-placeholder="Type a command..."
-style="width:90%;padding:12px;border-radius:10px;border:none;font-size:16px;">
-
-<br><br>
-
-<button onclick="sendCommand()">
-Send
-</button>
-
-<div id="reply"
-style="margin-top:20px;color:#00ff99;font-size:18px;">
-</div>
-
-</div>
 <script>
-function startRider() {function sendCommand() {
-  let text = document.getElementById("command").value;
-  document.getElementById("reply").innerHTML =
-  "🤖 RIDER: You said - " + text;
-}
+function startRider() {
   document.getElementById("status").innerHTML = "🟢 RIDER Online";
   document.getElementById("reply").innerHTML = "Hello Boss! I am RIDER.";
 }
+
+function sendCommand() {
+  let text = document.getElementById("command").value;
+  document.getElementById("reply").innerHTML =
+    "🤖 RIDER: You said - " + text;
+}
 </script>
-</body>
