@@ -1,11 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>RIDER AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RIDER AI</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#000;
+color:#fff;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.card{
+width:90%;
+max-width:400px;
+padding:30px;
+border:2px solid #00bfff;
+border-radius:20px;
+text-align:center;
+box-shadow:0 0 20px #00bfff;
+}
+
+.logo{
+font-size:70px;
+}
+
+h1{
+color:#00bfff;
+margin:10px 0;
+}
+
+p{
+color:#bbb;
+margin-bottom:20px;
+}
+
+button{
+background:#00bfff;
+color:white;
+border:none;
+padding:15px 30px;
+font-size:18px;
+border-radius:30px;
+cursor:pointer;
+margin-top:10px;
+}
+
+button:hover{
+background:#0099dd;
+}
+
+#reply{
+margin-top:20px;
+color:#00ff99;
+font-size:18px;
+}
+</style>
+
 </head>
-<body style="background:black;color:white;text-align:center;font-family:Arial;padding-top:100px;">
-  <h1>🤖 RIDER AI</h1>
-  <p>Welcome Boss!</p>
-  <button onclick="alert('RIDER Ready!')">Start Rider</button>
+<body>
+
+<div class="card">
+
+<div class="logo">🤖</div>
+
+<h1>RIDER AI</h1>
+
+<p>Welcome Back, Boss</p>
+
+<button onclick="startRider()">🎤 Start Rider</button>
+
+<div id="reply"></div>
+
+</div>
+
+<script>
+function startRider(){
+document.getElementById("reply").innerHTML =
+"✅ RIDER is Online<br><br>Hello Boss! How can I help you today?";
+}
+</script>
+
 </body>
 </html>
