@@ -32,7 +32,11 @@ style="margin-top:20px;color:#00ff99;font-size:18px;">
 
 </div>
 <script>
-function startRider() {
+function startRider() {function sendCommand() {
+  let text = document.getElementById("command").value;
+  document.getElementById("reply").innerHTML =
+  "🤖 RIDER: You said - " + text;
+}
   document.getElementById("status").innerHTML = "🟢 RIDER Online";
   document.getElementById("reply").innerHTML = "Hello Boss! I am RIDER.";
 }
