@@ -1,32 +1,40 @@
+<body>
+
+<div class="card">
+
+<div style="font-size:80px;">🤖</div>
+
+<h1>RIDER AI</h1>
+
+<p id="status">Welcome Back, Boss</p>
+
+<button onclick="startRider()">
+🎤 Start Rider
+</button>
+
+<br><br>
+
+<input
+id="command"
+type="text"
+placeholder="Type a command..."
+style="width:90%;padding:12px;border-radius:10px;border:none;font-size:16px;">
+
+<br><br>
+
+<button onclick="sendCommand()">
+Send
+</button>
+
+<div id="reply"
+style="margin-top:20px;color:#00ff99;font-size:18px;">
+</div>
+
+</div>
 <script>
 function startRider() {
-  const reply = document.getElementById("reply");
-
-  reply.innerHTML = "🎤 Listening...";
-
-  if (!('webkitSpeechRecognition' in window)) {
-    reply.innerHTML = "❌ Voice recognition is not supported in this browser.";
-    return;
-  }
-
-  const recognition = new webkitSpeechRecognition();
-  recognition.lang = "en-IN";
-  recognition.start();
-
-  recognition.onresult = function(event) {
-    const text = event.results[0][0].transcript;
-
-    reply.innerHTML =
-      "<b>You:</b> " + text +
-      "<br><br><b>RIDER:</b> I heard you say: " + text;
-
-    const speech = new SpeechSynthesisUtterance("You said " + text);
-    speech.lang = "en-IN";
-    speechSynthesis.speak(speech);
-  };
-
-  recognition.onerror = function() {
-    reply.innerHTML = "⚠️ I couldn't hear you. Please try again.";
-  };
+  document.getElementById("status").innerHTML = "🟢 RIDER Online";
+  document.getElementById("reply").innerHTML = "Hello Boss! I am RIDER.";
 }
 </script>
+</body>
