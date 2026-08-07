@@ -165,7 +165,10 @@ else if (text == "hi") {
 else if (text == "time") {
   reply = "🕒 " + new Date().toLocaleTimeString();
 }
-
+else {
+  reply = "🤖 Sorry Boss, I don't understand.";
+}
+  
   document.getElementById("reply").innerHTML = reply;
 
 document.getElementById("history").innerHTML =
