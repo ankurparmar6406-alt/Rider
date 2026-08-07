@@ -152,10 +152,10 @@ function startRider() {
 
   recognition.start();
 }
-function sendComman
-let text = 
-  let reply = "";
 
+function sendCommand() {
+  let text = document.getElementById("command").value.toLowerCase().trim();
+  let reply = "";
   if (text == "hello") {
   reply = "👋 Hello Boss!";
 }
