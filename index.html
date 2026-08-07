@@ -111,9 +111,17 @@ document.getElementById("status").innerHTML="🟢 RIDER Online";
 document.getElementById("reply").innerHTML="Hello Boss! I am RIDER.";
 }
 
-function sendCommand(){
-let text=document.getElementById("command").value;
-document.getElementById("reply").innerHTML="🤖 RIDER: You said - "+text;
+function sendCommand() {
+  let text = document.getElementById("command").value;
+
+  document.getElementById("reply").innerHTML =
+    "🤖 RIDER: You said - " + text;
+
+  let speech = new SpeechSynthesisUtterance(
+    "You said " + text
+  );
+  speech.lang = "en-US";
+  speechSynthesis.speak(speech);
 }
 
 function updateTime(){
