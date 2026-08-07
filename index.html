@@ -157,12 +157,14 @@ function sendCommand() {
   let reply = "";
 
   if (text == "hello") {
-    reply = "👋 Hello Boss!";
-  } else if (text == "time") {
-    reply = "🕒 " + new Date().toLocaleTimeString();
-  } else {
-    reply = "🤖 Sorry Boss, I don't understand.";
-  }
+  reply = "👋 Hello Boss!";
+}
+else if (text == "hi") {
+  reply = "👋 Hi Boss!";
+}
+else if (text == "time") {
+  reply = "🕒 " + new Date().toLocaleTimeString();
+}
 
   document.getElementById("reply").innerHTML = reply;
 
