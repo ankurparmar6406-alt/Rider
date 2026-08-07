@@ -130,19 +130,24 @@ function startRider() {
 
   recognition.start();
 }
-
 function sendCommand() {
-  let text = document.getElementById("command").value;
+  let text = document.getElementById("command").value.toLowerCase();
+  let reply = "";
 
-  document.getElementById("reply").innerHTML =
-    "🤖 RIDER: You said - " + text;
+  if (text == "hello") {
+    reply = "👋 Hello Boss!";
+  } else if (text == "time") {
+    reply = "🕒 " + new Date().toLocaleTimeString();
+  } else {
+    reply = "🤖 Sorry Boss, I don't understand.";
+  }
 
-  let speech = new SpeechSynthesisUtterance(
-    "You said " + text
-  );
-  speech.lang = "en-US";
+  document.getElementById("reply").innerHTML = reply;
+
+  let speech = new SpeechSynthesisUtterance(reply);
   speechSynthesis.speak(speech);
 }
+
 
 function updateTime(){
   const now = new Date();
