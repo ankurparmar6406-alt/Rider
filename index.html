@@ -220,7 +220,7 @@ async function updateBattery() {
         "🔋 Battery: " + Math.round(battery.level * 100) + "%";
     }
 
-    updateBattery();
+    update();
 
     battery.addEventListener("levelchange", update);
 
