@@ -75,6 +75,10 @@ System Online
 
 <p id="status">Welcome Back, Boss</p>
 
+<div id="info" style="color:#00bfff;margin-bottom:15px;">
+🕒 Loading Time...
+</div>
+
 <button onclick="startRider()">🎤 Start Rider</button>
 
 <br>
@@ -109,6 +113,16 @@ function sendCommand(){
 let text=document.getElementById("command").value;
 document.getElementById("reply").innerHTML="🤖 RIDER: You said - "+text;
 }
+
+function updateTime(){
+  const now = new Date();
+  document.getElementById("info").innerHTML =
+    "🕒 " + now.toLocaleTimeString();
+}
+
+setInterval(updateTime,1000);
+updateTime();
+  
 </script>
 
 </body>
