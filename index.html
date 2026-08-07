@@ -162,6 +162,13 @@ function updateTime(){
 setInterval(updateTime,1000);
 updateTime();
 
+async function updateBattery() {
+  document.getElementById("battery").innerHTML =
+    "🔋 Battery feature coming soon";
+}
+
+updateBattery();
+  
 function speakRider() {
   let speech = new SpeechSynthesisUtterance("Hello Boss, I am Rider.");
   speechSynthesis.speak(speech);
