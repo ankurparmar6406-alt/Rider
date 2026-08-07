@@ -166,6 +166,9 @@ function sendCommand() {
 
   document.getElementById("reply").innerHTML = reply;
 
+document.getElementById("history").innerHTML =
+"👤 " + text + "<br>🤖 " + reply;
+  
   let speech = new SpeechSynthesisUtterance(reply);
   speechSynthesis.speak(speech);
 }
