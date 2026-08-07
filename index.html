@@ -152,6 +152,11 @@ function updateTime(){
 
 setInterval(updateTime,1000);
 updateTime();
+
+function speakRider() {
+  let speech = new SpeechSynthesisUtterance("Hello Boss, I am Rider.");
+  speechSynthesis.speak(speech);
+}
   
 </script>
 
