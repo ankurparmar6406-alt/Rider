@@ -106,9 +106,29 @@ System Online
 </div>
 
 <script>
-function startRider(){
-document.getElementById("status").innerHTML="🟢 RIDER Online";
-document.getElementById("reply").innerHTML="Hello Boss! I am RIDER.";
+function startRider() {
+  document.getElementById("status").innerHTML = "🟢 RIDER Listening...";
+
+  if (!('webkitSpeechRecognition' in window)) {
+    document.getElementById("reply").innerHTML =
+      "❌ Voice recognition is not supported in this browser.";
+    return;
+  }
+
+  const recognition = new webkitSpeechRecognition();
+  recognition.lang = "en-US";
+
+  recognition.onresult = function(event) {
+    let text = event.results[0][0].transcript;
+
+    document.getElementById("reply").innerHTML =
+      "🎤 You said: " + text;
+
+    let speech = new SpeechSynthesisUtterance("You said " + text);
+    speechSynthesis.speak(speech);
+  };
+
+  recognition.start();
 }
 
 function sendCommand() {
