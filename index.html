@@ -210,8 +210,27 @@ setInterval(updateTime,1000);
 updateTime();
 
 async function updateBattery() {
-  document.getElementById("battery").innerHTML =
-    "🔋 Battery feature coming soon";
+
+  if ('getBattery' in navigator) {
+
+    const battery = await navigator.getBattery();
+
+    function update() {
+      document.getElementById("battery").innerHTML =
+        "🔋 Battery: " + Math.round(battery.level * 100) + "%";
+    }
+
+    updateBattery();
+
+    battery.addEventListener("levelchange", update);
+
+  } else {
+
+    document.getElementById("battery").innerHTML =
+      "❌ Battery API not supported";
+
+  }
+
 }
 
 updateBattery();
