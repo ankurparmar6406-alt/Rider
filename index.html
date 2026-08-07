@@ -155,11 +155,7 @@ function startRider() {
 
 function sendCommand() {
   let text = document.getElementById("command").value.toLowerCase().trim();
- document.getElementById("reply").innerHTML = text;
-return;
   let reply = "";
-
-  alert(text);
 
   if (text == "hello") {
     reply = "👋 Hello Boss!";
