@@ -172,7 +172,11 @@ else if (text == "time") {
 else if (text == "my name") {
   reply = "😊 You are my Boss!";
 }
-    
+
+else if (text == "date") {
+  reply = "📅 " + new Date().toLocaleDateString();
+}
+  
 else {
   reply = "🤖 Sorry Boss, I don't understand.";
 }
