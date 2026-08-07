@@ -170,19 +170,19 @@ else if (text == "time") {
   reply = "🕒 " + new Date().toLocaleTimeString();
 }
   
-  else if (text == "who are you") {
+  else if (text.includes("who are you")) {
   reply = "🤖 I am RIDER AI, your personal assistant.";
 }
 
-else if (text == "my name") {
+else if (text.includes("my name")) {
   reply = "😊 You are my Boss!";
 }
 
-else if (text == "date") {
+else if (text.includes("date")) {
   reply = "📅 " + new Date().toLocaleDateString();
 }
 
-else if (text == "bye") {
+else if (text.includes("bye")) {
   reply = "👋 Goodbye Boss!";
 }
   
