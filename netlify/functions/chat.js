@@ -16,7 +16,13 @@ exports.handler = async function(event) {
             {
               parts: [
                 {
-                  text: message
+                  text: `You are RIDER AI.
+Always call the user "Boss".
+Reply in simple Hindi/Hinglish.
+Be friendly and helpful.
+
+User message:
+${message}`
                 }
               ]
             }
