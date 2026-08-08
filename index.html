@@ -154,13 +154,42 @@ function startRider() {
   recognition.start();
 }
 
-function sendCommand() {
-  let text = document.getElementById("command").value.toLowerCase().trim();
+async function sendCommand() {
+  let text = document.getElementById("command").value.trim();
   let reply = "";
 
-  if (text == "hello") {
-    reply = "👋 Hello Boss!";
+  if (!text) {
+    reply = "🤖 Boss, kuch type karo.";
+  } else {
+    document.getElementById("reply").innerHTML = "🤖 Rider soch raha hai...";
+
+    try {
+      const response = await fetch("/.netlify/functions/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: text
+        })
+      });
+
+      const data = await response.json();
+      reply = data.reply || "🤖 Sorry Boss, reply nahi mila.";
+
+    } catch (error) {
+      reply = "❌ Boss, connection error aa gaya.";
+    }
   }
+
+  document.getElementById("reply").innerHTML = reply;
+
+  document.getElementById("history").innerHTML =
+    "👤 " + text + "<br>🤖 " + reply;
+
+  let speech = new SpeechSynthesisUtterance(reply);
+  speechSynthesis.speak(speech);
+}
 
     
 else if (text == "hi") {
