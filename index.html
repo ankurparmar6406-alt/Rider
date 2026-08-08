@@ -130,13 +130,42 @@ No messages yet...
 
 <script>
 function startRider() {
-  document.getElementById("status").innerHTML = "🟢 RIDER Listening...";
+  document.getElementById("status").innerHTML =
+    "🟢 RIDER Listening...";
 
-  if (!('webkitSpeechRecognition' in window)) {
+  if (!("webkitSpeechRecognition" in window)) {
     document.getElementById("reply").innerHTML =
-      "❌ Voice recognition is not supported in this browser.";
+      "❌ Voice recognition supported nahi hai.";
     return;
   }
+
+  const recognition = new webkitSpeechRecognition();
+
+  recognition.lang = "en-IN";
+  recognition.continuous = false;
+  recognition.interimResults = false;
+
+  recognition.onresult = async function(event) {
+    const text = event.results[0][0].transcript;
+
+    document.getElementById("reply").innerHTML =
+      "🎤 You said: " + text;
+
+    document.getElementById("command").value = text;
+
+    await sendCommand();
+
+    document.getElementById("status").innerHTML =
+      "🟢 RIDER Online";
+  };
+
+  recognition.onerror = function() {
+    document.getElementById("status").innerHTML =
+      "❌ Voice error";
+  };
+
+  recognition.start();
+}
 
   const recognition = new webkitSpeechRecognition();
   recognition.lang = "en-US";
