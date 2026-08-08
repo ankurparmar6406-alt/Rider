@@ -182,11 +182,13 @@ function startRider(){
       "🟢 RIDER Online";
   };
 
-  recognition.onerror = function(){
+  recognition.onerror = function(event) {
+  document.getElementById("status").innerHTML =
+    "❌ Voice error: " + event.error;
 
-    document.getElementById("status").innerHTML =
-      "❌ Voice error";
-  };
+  document.getElementById("reply").innerHTML =
+    "🎤 Voice error: " + event.error;
+};
 
   recognition.start();
 }
