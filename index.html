@@ -168,6 +168,22 @@ function startRider() {
 }
 
 async function sendCommand() {
+  
+  let text = document.getElementById("command").value.trim();
+let reply = "";
+
+  if (text.toLowerCase() === "time") {
+  let now = new Date();
+  reply = "🕒 Boss, abhi time " + now.toLocaleTimeString("en-IN") + " hai.";
+
+  document.getElementById("reply").innerHTML = reply;
+
+  let speech = new SpeechSynthesisUtterance(reply);
+  speechSynthesis.speak(speech);
+
+  return;
+}
+  
   let text = document.getElementById("command").value.trim();
   let reply = "";
 
