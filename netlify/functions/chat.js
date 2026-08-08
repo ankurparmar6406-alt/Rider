@@ -4,7 +4,7 @@ exports.handler = async function(event) {
     const message = body.message || "";
 
     const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" +
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" +
       process.env.GEMINI_API_KEY,
       {
         method: "POST",
@@ -27,23 +27,40 @@ exports.handler = async function(event) {
 
     const data = await response.json();
 
+    if (!response.ok) {
+      return {
+        statusCode: response.status,
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          reply: "❌ Gemini Error: " + (data.error?.message || "Unknown error")
+        })
+      };
+    }
+
     const reply =
       data.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "Sorry Boss, mujhe reply nahi mila.";
+      "🤖 Gemini ne koi reply nahi diya.";
 
     return {
       statusCode: 200,
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ reply })
+      body: JSON.stringify({
+        reply: reply
+      })
     };
 
   } catch (error) {
     return {
       statusCode: 500,
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({
-        reply: "Sorry Boss, kuch error aa gaya."
+        reply: "❌ Server Error: " + error.message
       })
     };
   }
