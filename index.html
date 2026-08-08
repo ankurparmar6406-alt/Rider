@@ -2,54 +2,88 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>RIDER AI</title>
 
 <style>
 body{
-margin:0;
-background:#000;
-color:white;
-font-family:Arial,sans-serif;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
+  margin:0;
+  background:#000;
+  color:white;
+  font-family:Arial,sans-serif;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
 }
 
 .card{
-width:90%;
-max-width:400px;
-text-align:center;
-padding:20px;
-border:2px solid #00bfff;
-border-radius:20px;
-box-shadow:0 0 20px #00bfff;
+  width:90%;
+  max-width:430px;
+  text-align:center;
+  padding:20px;
+  border:2px solid #00bfff;
+  border-radius:20px;
+  box-shadow:0 0 20px #00bfff;
+}
+
+.logo{
+  width:80px;
+  height:80px;
+  margin:20px auto;
+  border-radius:50%;
+  background:#00bfff;
+  box-shadow:0 0 30px #00bfff;
 }
 
 input{
-width:90%;
-padding:12px;
-margin-top:15px;
-border:none;
-border-radius:10px;
-font-size:16px;
+  width:90%;
+  box-sizing:border-box;
+  padding:12px;
+  margin-top:15px;
+  border:0;
+  border-radius:10px;
+  font-size:16px;
 }
 
 button{
-margin-top:15px;
-padding:12px 25px;
-border:none;
-border-radius:25px;
-background:#00bfff;
-color:white;
-font-size:18px;
-cursor:pointer;
+  margin:8px 4px;
+  padding:12px 20px;
+  border:0;
+  border-radius:25px;
+  background:#00bfff;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+}
+
+button:active{
+  transform:scale(.96);
 }
 
 #reply{
-margin-top:20px;
-color:#00ff99;
+  margin-top:20px;
+  color:#00ff99;
+  line-height:1.5;
+}
+
+#info{
+  color:#00bfff;
+}
+
+#battery{
+  color:#00ff99;
+}
+
+#status{
+  color:#fff;
+}
+
+#history{
+  text-align:left;
+  max-height:180px;
+  overflow:auto;
+  line-height:1.5;
 }
 </style>
 </head>
@@ -60,93 +94,82 @@ color:#00ff99;
 
 <h1>🤖 RIDER AI</h1>
 
-<div>
-🟢 RIDER ONLINE
-</div>
-  
-<div style="margin:20px 0;">
-  <div style="width:80px;height:80px;border-radius:50%;background:#00bfff;margin:auto;box-shadow:0 0 30px #00bfff;"></div>
-  <p style="color:#00bfff;margin-top:10px;">🟢 SYSTEM ONLINE</p>
-</div>
+<div>🟢 RIDER ONLINE</div>
 
-<div style="margin:15px 0;font-size:50px;">
-🔵
-</div>
-
-<p style="color:#00bfff;">
-System Online
-</p>
+<div class="logo"></div>
 
 <p id="status">Welcome Back, Boss</p>
 
-<h3 id="welcome">👋 Welcome Back, Boss!</h3>
-  
-<div id="info" style="color:#00bfff;margin-bottom:15px;">
-🕒 Loading Time...
-</div>
+<div id="info">🕒 Loading Time...</div>
 
-  
-<div id="battery" style="color:#00ff99;">
-🔋 Loading Battery...
-</div>
+<div id="battery">🔋 Loading Battery...</div>
 
-  <div id="weather">
-🌤️ Ahmedabad: Sunny
-</div>
-  
+<div id="weather">🌤️ Weather: Loading...</div>
+
+<br>
+
 <button onclick="startRider()">🎤 Start Rider</button>
 
 <button onclick="speakRider()">🔊 Speak</button>
-  
-<br>
 
 <input id="command" placeholder="Type here...">
 
-<br>
-
 <button onclick="sendCommand()">Send</button>
 
-<br><br>
+<button onclick="openYouTube()">▶️ YouTube</button>
 
-<button onclick="alert('Voice feature coming soon!')">
-🎤 Voice
-</button>
+<button onclick="openGoogle()">🌐 Google</button>
 
-<button onclick="alert('Settings coming soon!')">
-⚙️ Settings
-</button>
+<button onclick="chooseFile()">📁 File</button>
+
+<input
+  id="fileInput"
+  type="file"
+  style="display:none"
+  onchange="fileSelected()"
+>
 
 <hr>
 
 <h3>💬 Chat History</h3>
 
-<div id="history">
-No messages yet...
-</div>
-  
+<div id="history">No messages yet...</div>
+
 <div id="reply"></div>
 
 </div>
 
 <script>
-function startRider() {
+
+let recognition = null;
+
+/* =========================
+   VOICE INPUT
+========================= */
+
+function startRider(){
+
   document.getElementById("status").innerHTML =
     "🟢 RIDER Listening...";
 
-  if (!("webkitSpeechRecognition" in window)) {
+  if(!("webkitSpeechRecognition" in window)){
+
     document.getElementById("reply").innerHTML =
-      "❌ Voice recognition supported nahi hai.";
+      "❌ Is browser me voice recognition available nahi hai.";
+
     return;
   }
 
-  const recognition = new webkitSpeechRecognition();
+  recognition = new webkitSpeechRecognition();
 
   recognition.lang = "en-IN";
   recognition.continuous = false;
   recognition.interimResults = false;
 
-  recognition.onresult = async function(event) {
-    const text = event.results[0][0].transcript;
+  recognition.onresult = async function(event){
+
+    const text =
+      event.results[0][0].transcript;
 
     document.getElementById("command").value = text;
 
@@ -159,7 +182,8 @@ function startRider() {
       "🟢 RIDER Online";
   };
 
-  recognition.onerror = function() {
+  recognition.onerror = function(){
+
     document.getElementById("status").innerHTML =
       "❌ Voice error";
   };
@@ -167,96 +191,341 @@ function startRider() {
   recognition.start();
 }
 
-async function sendCommand() {
-  
-  let text = document.getElementById("command").value.trim();
-let reply = "";
 
-  if (text.toLowerCase() === "time") {
-  let now = new Date();
-  reply = "🕒 Boss, abhi time " + now.toLocaleTimeString("en-IN") + " hai.";
+/* =========================
+   MAIN COMMAND
+========================= */
 
-  document.getElementById("reply").innerHTML = reply;
+async function sendCommand(){
 
-  let speech = new SpeechSynthesisUtterance(reply);
-  speechSynthesis.speak(speech);
+  const text =
+    document.getElementById("command").value.trim();
 
-  return;
-}
+  if(!text){
 
-  if (!text) {
-    reply = "🤖 Boss, kuch type karo.";
-  } else {
-    document.getElementById("reply").innerHTML = "🤖 Rider soch raha hai...";
+    showReply("🤖 Boss, kuch bolo.");
 
-    try {
-      const response = await fetch("/.netlify/functions/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          message: text
-        })
-      });
-
-      const data = await response.json();
-      reply = data.reply || "🤖 Sorry Boss, reply nahi mila.";
-
-    } catch (error) {
-      reply = "❌ Boss, connection error aa gaya.";
-    }
+    return;
   }
 
-  document.getElementById("reply").innerHTML = reply;
+  const command = text.toLowerCase();
+
+
+  /* TIME */
+
+  if(command.includes("time")){
+
+    const now = new Date();
+
+    const reply =
+      "🕒 Boss, abhi time " +
+      now.toLocaleTimeString("en-IN") +
+      " hai.";
+
+    showReply(reply);
+
+    speak(reply);
+
+    return;
+  }
+
+
+  /* DATE */
+
+  if(command.includes("date") ||
+     command.includes("today")){
+
+    const now = new Date();
+
+    const reply =
+      "📅 Boss, aaj " +
+      now.toLocaleDateString("en-IN") +
+      " hai.";
+
+    showReply(reply);
+
+    speak(reply);
+
+    return;
+  }
+
+
+  /* YOUTUBE */
+
+  if(command.includes("youtube")){
+
+    openYouTube();
+
+    const reply =
+      "▶️ Boss, YouTube khol raha hoon.";
+
+    showReply(reply);
+
+    speak(reply);
+
+    return;
+  }
+
+
+  /* GOOGLE */
+
+  if(command.includes("google")){
+
+    openGoogle();
+
+    const reply =
+      "🌐 Boss, Google khol raha hoon.";
+
+    showReply(reply);
+
+    speak(reply);
+
+    return;
+  }
+
+
+  /* FILE */
+
+  if(command.includes("file") ||
+     command.includes("video") ||
+     command.includes("photo")){
+
+    chooseFile();
+
+    const reply =
+      "📁 Boss, file select karo.";
+
+    showReply(reply);
+
+    speak(reply);
+
+    return;
+  }
+
+
+  /* GEMINI */
+
+  document.getElementById("reply").innerHTML =
+    "🤖 Rider soch raha hai...";
+
+  try{
+
+    const response = await fetch(
+      "/.netlify/functions/chat",
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+          message:text
+        })
+      }
+    );
+
+    const data =
+      await response.json();
+
+    const reply =
+      data.reply ||
+      "🤖 Boss, reply nahi mila.";
+
+    showReply(reply);
+
+    speak(reply);
+
+  }catch(error){
+
+    showReply(
+      "❌ Boss, connection error aa gaya."
+    );
+  }
+}
+
+
+/* =========================
+   DISPLAY REPLY
+========================= */
+
+function showReply(reply){
+
+  document.getElementById("reply").innerHTML =
+    reply;
+
+  const text =
+    document.getElementById("command").value;
 
   document.getElementById("history").innerHTML =
-    "👤 " + text + "<br>🤖 " + reply;
+    "👤 " +
+    escapeHtml(text) +
+    "<br>🤖 " +
+    escapeHtml(reply);
+}
 
-  let speech = new SpeechSynthesisUtterance(reply);
+
+/* =========================
+   VOICE OUTPUT
+========================= */
+
+function speak(text){
+
+  if(!("speechSynthesis" in window))
+    return;
+
+  speechSynthesis.cancel();
+
+  const speech =
+    new SpeechSynthesisUtterance(text);
+
+  speech.lang = "hi-IN";
+  speech.rate = 0.95;
+  speech.pitch = 1;
+
   speechSynthesis.speak(speech);
 }
 
+
+function speakRider(){
+
+  speak(
+    "Hello Boss, main Rider AI hoon. Main aapki help ke liye ready hoon."
+  );
+}
+
+
+/* =========================
+   OPEN WEBSITES
+========================= */
+
+function openYouTube(){
+
+  window.open(
+    "https://www.youtube.com",
+    "_blank"
+  );
+}
+
+
+function openGoogle(){
+
+  window.open(
+    "https://www.google.com",
+    "_blank"
+  );
+}
+
+
+/* =========================
+   FILE SELECT
+========================= */
+
+function chooseFile(){
+
+  document
+    .getElementById("fileInput")
+    .click();
+}
+
+
+function fileSelected(){
+
+  const file =
+    document.getElementById("fileInput").files[0];
+
+  if(!file)
+    return;
+
+  const reply =
+    "📁 Boss, file select ho gayi: " +
+    file.name;
+
+  showReply(reply);
+
+  speak(
+    "Boss, file select ho gayi."
+  );
+}
+
+
+/* =========================
+   TIME DISPLAY
+========================= */
+
 function updateTime(){
-  const now = new Date();
+
+  const now =
+    new Date();
+
   document.getElementById("info").innerHTML =
-    "🕒 " + now.toLocaleTimeString();
+    "🕒 " +
+    now.toLocaleTimeString("en-IN");
 }
 
 setInterval(updateTime,1000);
+
 updateTime();
 
-async function updateBattery() {
 
-  if ('getBattery' in navigator) {
+/* =========================
+   BATTERY
+========================= */
 
-    const battery = await navigator.getBattery();
+async function updateBattery(){
 
-    function update() {
+  if(!("getBattery" in navigator)){
+
+    document.getElementById("battery").innerHTML =
+      "🔋 Battery information unavailable";
+
+    return;
+  }
+
+  try{
+
+    const battery =
+      await navigator.getBattery();
+
+    function update(){
+
       document.getElementById("battery").innerHTML =
-        "🔋 Battery: " + Math.round(battery.level * 100) + "%";
+        "🔋 Battery: " +
+        Math.round(battery.level * 100) +
+        "%";
     }
 
     update();
 
-    battery.addEventListener("levelchange", update);
+    battery.addEventListener(
+      "levelchange",
+      update
+    );
 
-  } else {
+  }catch(error){
 
     document.getElementById("battery").innerHTML =
-      "❌ Battery API not supported";
-
+      "🔋 Battery unavailable";
   }
-
 }
 
 updateBattery();
-  
-function speakRider() {
-  let speech = new SpeechSynthesisUtterance("Hello Boss, I am Rider.");
-  speechSynthesis.speak(speech);
+
+
+/* =========================
+   HTML SAFETY
+========================= */
+
+function escapeHtml(text){
+
+  return String(text)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 }
-  
+
 </script>
 
 </body>
