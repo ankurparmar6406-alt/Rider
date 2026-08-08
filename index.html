@@ -140,34 +140,6 @@ function startRider() {
   }
 
   const recognition = new webkitSpeechRecognition();
-
-  recognition.lang = "en-IN";
-  recognition.continuous = false;
-  recognition.interimResults = false;
-
-  recognition.onresult = async function(event) {
-    const text = event.results[0][0].transcript;
-
-    document.getElementById("reply").innerHTML =
-      "🎤 You said: " + text;
-
-    document.getElementById("command").value = text;
-
-    await sendCommand();
-
-    document.getElementById("status").innerHTML =
-      "🟢 RIDER Online";
-  };
-
-  recognition.onerror = function() {
-    document.getElementById("status").innerHTML =
-      "❌ Voice error";
-  };
-
-  recognition.start();
-}
-
-  const recognition = new webkitSpeechRecognition();
   recognition.lang = "en-US";
 
   recognition.onresult = function(event) {
