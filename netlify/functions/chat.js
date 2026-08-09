@@ -1,45 +1,32 @@
 exports.handler = async function(event) {
   try {
-    // Only POST allowed
     if (event.httpMethod !== "POST") {
       return {
         statusCode: 405,
-        headers: {
-          "Content-Type": "application/json"
-        },
         body: JSON.stringify({
-          reply: "❌ Boss, POST request required."
+          reply: "❌ POST request required."
         })
       };
     }
-    // Read request
     const body = JSON.parse(event.body || "{}");
-    const message = String(body.message || "").trim();
-    if (!message) {
+    const query = String(body.query || "").trim();
+    if (!query) {
       return {
         statusCode: 400,
-        headers: {
-          "Content-Type": "application/json"
-        },
         body: JSON.stringify({
-          reply: "🤖 Boss, kuch bolo."
+          reply: "🔎 Boss, kis topic par research karni hai?"
         })
       };
     }
-    // API key from Netlify Environment Variables
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return {
         statusCode: 500,
-        headers: {
-          "Content-Type": "application/json"
-        },
         body: JSON.stringify({
-          reply: "❌ Boss, GEMINI_API_KEY Netlify me set nahi hai."
+          reply: "❌ GEMINI_API_KEY missing hai."
         })
       };
     }
-    // Current Gemini model
     const url =
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=" +
       encodeURIComponent(apiKey);
@@ -49,16 +36,21 @@ exports.handler = async function(event) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
+        tools: [
+          {
+            googleSearch: {}
+          }
+        ],
         systemInstruction: {
           parts: [
             {
               text:
-                "You are RIDER AI, a friendly personal AI assistant. " +
+                "You are RIDER AI Research Assistant. " +
                 "Call the user Boss. " +
-                "Understand Hindi, Hinglish and English. " +
-                "Reply in the same language as the user. " +
-                "Be natural, helpful and concise. " +
-                "Do not claim that you performed an action unless the website actually performed it."
+                "Research the requested topic using Google Search grounding. " +
+                "Answer in Hindi, Hinglish, or English according to the user's request. " +
+                "Give a concise useful summary and mention important sources when available. " +
+                "Do not invent facts."
             }
           ]
         },
@@ -67,7 +59,7 @@ exports.handler = async function(event) {
             role: "user",
             parts: [
               {
-                text: message
+                text: "Research this topic: " + query
               }
             ]
           }
@@ -75,7 +67,6 @@ exports.handler = async function(event) {
       })
     });
     const data = await response.json();
-    // Gemini error
     if (!response.ok) {
       return {
         statusCode: response.status,
@@ -84,25 +75,24 @@ exports.handler = async function(event) {
         },
         body: JSON.stringify({
           reply:
-            "❌ Gemini Error: " +
-            (data.error?.message || "Unknown Gemini error")
+            "❌ Research Error: " +
+            (data.error?.message || "Unknown error")
         })
       };
     }
-    // Extract answer
     const reply =
       data.candidates?.[0]?.content?.parts
         ?.map(part => part.text || "")
         .join("")
         .trim() ||
-      "🤖 Boss, mujhe reply nahi mila.";
+      "🤖 Boss, research result nahi mila.";
     return {
       statusCode: 200,
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        reply: reply
+        reply
       })
     };
   } catch (error) {
@@ -113,7 +103,7 @@ exports.handler = async function(event) {
       },
       body: JSON.stringify({
         reply:
-          "❌ Server Error: " +
+          "❌ Research Server Error: " +
           (error.message || "Unknown error")
       })
     };
