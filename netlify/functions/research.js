@@ -1,8 +1,11 @@
-exports.handler = async function(event) {
+exports.handler = async function (event) {
   try {
     if (event.httpMethod !== "POST") {
       return {
         statusCode: 405,
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
           reply: "❌ POST request required."
         })
@@ -18,6 +21,9 @@ exports.handler = async function(event) {
     if (!query) {
       return {
         statusCode: 400,
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
           reply: "🔎 Boss, kis topic par research karni hai?"
         })
@@ -29,6 +35,9 @@ exports.handler = async function(event) {
     if (!apiKey) {
       return {
         statusCode: 500,
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
           reply: "❌ GEMINI_API_KEY nahi mili."
         })
@@ -36,8 +45,8 @@ exports.handler = async function(event) {
     }
 
     const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=" +
-      encodeURIComponent(apiKey),
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=" +
+        encodeURIComponent(apiKey),
       {
         method: "POST",
 
@@ -46,18 +55,32 @@ exports.handler = async function(event) {
         },
 
         body: JSON.stringify({
+          systemInstruction: {
+            parts: [
+              {
+                text:
+                  "You are RIDER AI Research Assistant. " +
+                  "Call the user Boss. " +
+                  "Answer in Hindi or Hinglish. " +
+                  "Give clear, useful and well-organized answers. " +
+                  "If the user asks for research, explain the topic " +
+                  "with important facts, background, advantages, " +
+                  "disadvantages and conclusion when appropriate. " +
+                  "Do not claim that you searched the live web."
+              }
+            ]
+          },
+
           contents: [
             {
               role: "user",
               parts: [
                 {
-                  text:
-                    "Research this topic and explain the important information clearly in Hindi/Hinglish:\n\n" +
-                    query
+                  text: query
                 }
               ]
             }
-          ],
+          ]
         })
       }
     );
@@ -65,12 +88,19 @@ exports.handler = async function(event) {
     const data = await response.json();
 
     if (!response.ok) {
+      const errorMessage =
+        data.error?.message ||
+        "Unknown Gemini error.";
+
       return {
         statusCode: response.status,
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
           reply:
             "❌ Gemini Research Error: " +
-            (data.error?.message || "Unknown error")
+            errorMessage
         })
       };
     }
@@ -95,6 +125,7 @@ exports.handler = async function(event) {
     };
 
   } catch (error) {
+
     return {
       statusCode: 500,
 
