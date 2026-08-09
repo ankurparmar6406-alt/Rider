@@ -88,22 +88,20 @@ exports.handler = async function (event) {
     const data = await response.json();
 
     if (!response.ok) {
-      const errorMessage =
-        data.error?.message ||
-        "Unknown Gemini error.";
-
-      return {
-        statusCode: response.status,
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          reply:
-            "❌ Gemini Research Error: " +
-            errorMessage
-        })
-      };
-    }
+  return {
+    statusCode: response.status,
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      reply:
+        "❌ Gemini Error: " +
+        (data.error?.message || "Unknown error") +
+        "\n\nDetails: " +
+        JSON.stringify(data.error?.details || [])
+    })
+  };
+}
 
     const reply =
       data.candidates?.[0]?.content?.parts
