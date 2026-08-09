@@ -1,6 +1,5 @@
 exports.handler = async function(event) {
   try {
-
     if (event.httpMethod !== "POST") {
       return {
         statusCode: 405,
@@ -15,12 +14,9 @@ exports.handler = async function(event) {
 
     const body = JSON.parse(event.body || "{}");
 
-    const query =
-      String(
-        body.query ||
-        body.message ||
-        ""
-      ).trim();
+    const query = String(
+      body.query || body.message || ""
+    ).trim();
 
     if (!query) {
       return {
@@ -29,13 +25,12 @@ exports.handler = async function(event) {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          reply: "❌ Research topic nahi mila."
+          reply: "❌ Boss, research topic nahi mila."
         })
       };
     }
 
-    const apiKey =
-      process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
       return {
@@ -44,69 +39,60 @@ exports.handler = async function(event) {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          reply: "❌ GEMINI_API_KEY Netlify me set nahi hai."
+          reply: "❌ Boss, GEMINI_API_KEY missing hai."
         })
       };
     }
 
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
-      {
-        method: "POST",
+    const url =
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent";
 
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": apiKey
-        },
+    const response = await fetch(url, {
+      method: "POST",
 
-        body: JSON.stringify({
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey
+      },
 
-          contents: [
-            {
-              parts: [
-                {
-                  text:
-                    "Research this topic carefully: " +
-                    query +
-                    "\n\n" +
-                    "Give the answer in the same language as the user. " +
-                    "Call the user Boss. " +
-                    "Use current web information when needed. " +
-                    "Clearly separate facts from uncertain information."
-                }
-              ]
-            }
-          ],
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              {
+                text:
+                  "You are RIDER AI research assistant. " +
+                  "Call the user Boss. " +
+                  "Research the following topic using current web information. " +
+                  "Answer in the same language as the user. " +
+                  "Give useful facts and mention important sources when available.\n\n" +
+                  "TOPIC:\n" +
+                  query
+              }
+            ]
+          }
+        ],
 
-          tools: [
-            {
-              google_search: {}
-            }
-          ]
+        tools: [
+          {
+            google_search: {}
+          }
+        ]
+      })
+    });
 
-        })
-      }
-    );
-
-    const data =
-      await response.json();
+    const data = await response.json();
 
     if (!response.ok) {
-
       return {
         statusCode: response.status,
-
         headers: {
           "Content-Type": "application/json"
         },
-
         body: JSON.stringify({
           reply:
             "❌ Gemini Research Error: " +
-            (
-              data.error?.message ||
-              "Unknown error"
-            )
+            (data.error?.message || "Unknown error")
         })
       };
     }
@@ -117,45 +103,24 @@ exports.handler = async function(event) {
         .join("")
         .trim();
 
-    if (!reply) {
-
-      return {
-        statusCode: 200,
-
-        headers: {
-          "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-          reply:
-            "🤖 Boss, research ka result nahi mila."
-        })
-      };
-    }
-
     return {
-
       statusCode: 200,
-
       headers: {
         "Content-Type": "application/json"
       },
-
       body: JSON.stringify({
-        reply: reply
+        reply:
+          reply ||
+          "🤖 Boss, research result nahi mila."
       })
     };
 
   } catch (error) {
-
     return {
-
       statusCode: 500,
-
       headers: {
         "Content-Type": "application/json"
       },
-
       body: JSON.stringify({
         reply:
           "❌ Research Server Error: " +
