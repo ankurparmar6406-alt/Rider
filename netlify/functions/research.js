@@ -58,12 +58,6 @@ exports.handler = async function(event) {
               ]
             }
           ],
-
-          tools: [
-            {
-              google_search: {}
-            }
-          ]
         })
       }
     );
