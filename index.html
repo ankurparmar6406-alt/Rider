@@ -4,522 +4,614 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>RIDER AI</title>
-
 <style>
+*{box-sizing:border-box}
 body{
   margin:0;
   background:#000;
   color:white;
   font-family:Arial,sans-serif;
+  min-height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
-  min-height:100vh;
 }
-
 .card{
-  width:90%;
-  max-width:430px;
-  text-align:center;
+  width:94%;
+  max-width:500px;
   padding:20px;
-  border:2px solid #00bfff;
-  border-radius:20px;
-  box-shadow:0 0 20px #00bfff;
-}
-
-.logo{
-  width:80px;
-  height:80px;
   margin:20px auto;
+  text-align:center;
+  border:2px solid #00bfff;
+  border-radius:22px;
+  box-shadow:0 0 25px #00bfff;
+}
+.logo{
+  width:85px;
+  height:85px;
+  margin:18px auto;
   border-radius:50%;
   background:#00bfff;
-  box-shadow:0 0 30px #00bfff;
+  box-shadow:0 0 35px #00bfff;
 }
-
+.status{
+  color:#00ff99;
+}
+.info{
+  color:#00bfff;
+  margin:7px;
+}
 input{
-  width:90%;
-  box-sizing:border-box;
-  padding:12px;
-  margin-top:15px;
+  width:100%;
+  padding:14px;
+  margin-top:12px;
   border:0;
-  border-radius:10px;
+  border-radius:12px;
   font-size:16px;
+  outline:none;
 }
-
 button{
-  margin:8px 4px;
-  padding:12px 20px;
+  margin:7px 3px;
+  padding:12px 18px;
   border:0;
   border-radius:25px;
   background:#00bfff;
   color:white;
-  font-size:16px;
+  font-size:15px;
   cursor:pointer;
 }
-
 button:active{
   transform:scale(.96);
 }
-
+button.secondary{
+  background:#222;
+  border:1px solid #00bfff;
+}
 #reply{
-  margin-top:20px;
+  margin-top:18px;
   color:#00ff99;
   line-height:1.5;
+  word-wrap:break-word;
 }
-
-#info{
-  color:#00bfff;
-}
-
-#battery{
-  color:#00ff99;
-}
-
-#status{
-  color:#fff;
-}
-
 #history{
   text-align:left;
-  max-height:180px;
+  max-height:220px;
   overflow:auto;
-  line-height:1.5;
+  padding:10px;
+  border-radius:10px;
+  background:#080808;
+  line-height:1.6;
+}
+#preview{
+  max-width:100%;
+  margin-top:15px;
+  border-radius:12px;
+}
+.hidden{
+  display:none;
 }
 </style>
 </head>
-
 <body>
-
 <div class="card">
-
 <h1>🤖 RIDER AI</h1>
-
-<div>🟢 RIDER ONLINE</div>
-
+<div class="status">🟢 RIDER ONLINE</div>
 <div class="logo"></div>
-
 <p id="status">Welcome Back, Boss</p>
-
-<div id="info">🕒 Loading Time...</div>
-
-<div id="battery">🔋 Loading Battery...</div>
-
-<div id="weather">🌤️ Weather: Loading...</div>
-
-<br>
-
+<div id="info" class="info">🕒 Loading Time...</div>
+<div id="battery" class="info">🔋 Loading Battery...</div>
+<div id="weather" class="info">🌤️ Weather ready</div>
+<hr>
+<!-- MAIN VOICE -->
 <button onclick="startRider()">🎤 Start Rider</button>
-
+<button onclick="stopRider()" class="secondary">⏹️ Stop</button>
 <button onclick="speakRider()">🔊 Speak</button>
-
-<input id="command" placeholder="Type here...">
-
-<button onclick="sendCommand()">Send</button>
-
-<button onclick="openYouTube()">▶️ YouTube</button>
-
-<button onclick="openGoogle()">🌐 Google</button>
-
+<input
+  id="command"
+  placeholder="Boss, type ya bolo..."
+  autocomplete="off"
+>
+<button onclick="sendCommand()">🚀 Send</button>
+<hr>
+<!-- TOOLS -->
+<h3>🛠️ RIDER Tools</h3>
+<button onclick="research()">🔎 Research</button>
+<button onclick="generateImage()">🖼️ Image AI</button>
+<button onclick="generateVideo()">🎬 Video AI</button>
 <button onclick="chooseFile()">📁 File</button>
-
+<br>
+<button onclick="openYouTube()">▶️ YouTube</button>
+<button onclick="openGoogle()">🌐 Google</button>
 <input
   id="fileInput"
   type="file"
-  style="display:none"
+  class="hidden"
   onchange="fileSelected()"
 >
-
+<img id="preview" class="hidden">
 <hr>
-
 <h3>💬 Chat History</h3>
-
 <div id="history">No messages yet...</div>
-
 <div id="reply"></div>
-
 </div>
-
 <script>
-
 let recognition = null;
-
+let listening = false;
 /* =========================
    VOICE INPUT
 ========================= */
-
 function startRider(){
-
-  document.getElementById("status").innerHTML =
-    "🟢 RIDER Listening...";
-
   if(!("webkitSpeechRecognition" in window)){
-
-    document.getElementById("reply").innerHTML =
-      "❌ Is browser me voice recognition available nahi hai.";
-
+    showReply(
+      "❌ Boss, is browser me voice recognition available nahi hai."
+    );
     return;
   }
-
+  if(listening){
+    return;
+  }
+  listening = true;
+  document.getElementById("status").innerHTML =
+    "🟢 RIDER Listening...";
   recognition = new webkitSpeechRecognition();
-
   recognition.lang = "en-IN";
   recognition.continuous = false;
   recognition.interimResults = false;
-
   recognition.onresult = async function(event){
-
     const text =
-      event.results[0][0].transcript;
-
+      event.results[0][0].transcript.trim();
     document.getElementById("command").value = text;
-
-    document.getElementById("reply").innerHTML =
-      "🎤 You said: " + text;
-
+    showReply("🎤 You said: " + text);
     await sendCommand();
-
+  };
+  recognition.onerror = function(event){
+    listening = false;
+    document.getElementById("status").innerHTML =
+      "❌ Voice error: " + event.error;
+    showReply(
+      "🎤 Voice error: " + event.error +
+      "<br>Microphone permission check karo."
+    );
+  };
+  recognition.onend = function(){
+    listening = false;
     document.getElementById("status").innerHTML =
       "🟢 RIDER Online";
   };
-
-  recognition.onerror = function(event) {
-  document.getElementById("status").innerHTML =
-    "❌ Voice error: " + event.error;
-
-  document.getElementById("reply").innerHTML =
-    "🎤 Voice error: " + event.error;
-};
-
-  recognition.start();
+  try{
+    recognition.start();
+  }catch(error){
+    listening = false;
+    showReply("❌ Voice start nahi hua.");
+  }
 }
-
-
+function stopRider(){
+  if(recognition){
+    try{
+      recognition.stop();
+    }catch(e){}
+  }
+  listening = false;
+  document.getElementById("status").innerHTML =
+    "🟢 RIDER Online";
+}
 /* =========================
    MAIN COMMAND
 ========================= */
-
 async function sendCommand(){
-
+  const input =
+    document.getElementById("command");
   const text =
-    document.getElementById("command").value.trim();
-
+    input.value.trim();
   if(!text){
-
     showReply("🤖 Boss, kuch bolo.");
-
     return;
   }
-
-  const command = text.toLowerCase();
-
-
+  const command =
+    text.toLowerCase();
   /* TIME */
-
-  if(command.includes("time")){
-
+  if(
+    command === "time" ||
+    command.includes("what time") ||
+    command.includes("kitne baje")
+  ){
     const now = new Date();
-
     const reply =
       "🕒 Boss, abhi time " +
       now.toLocaleTimeString("en-IN") +
       " hai.";
-
     showReply(reply);
-
     speak(reply);
-
     return;
   }
-
-
   /* DATE */
-
-  if(command.includes("date") ||
-     command.includes("today")){
-
+  if(
+    command === "date" ||
+    command.includes("today") ||
+    command.includes("aaj ki date")
+  ){
     const now = new Date();
-
     const reply =
       "📅 Boss, aaj " +
       now.toLocaleDateString("en-IN") +
       " hai.";
-
     showReply(reply);
-
     speak(reply);
-
     return;
   }
-
-
   /* YOUTUBE */
-
-  if(command.includes("youtube")){
-
+  if(
+    command === "youtube" ||
+    command.includes("youtube kholo")
+  ){
     openYouTube();
-
     const reply =
       "▶️ Boss, YouTube khol raha hoon.";
-
     showReply(reply);
-
     speak(reply);
-
     return;
   }
-
-
   /* GOOGLE */
-
-  if(command.includes("google")){
-
+  if(
+    command === "google" ||
+    command.includes("google kholo")
+  ){
     openGoogle();
-
     const reply =
       "🌐 Boss, Google khol raha hoon.";
-
     showReply(reply);
-
     speak(reply);
-
     return;
   }
-
-
+  /* IMAGE */
+  if(
+    command.includes("image banao") ||
+    command.includes("image bana") ||
+    command.includes("photo banao") ||
+    command.includes("picture banao")
+  ){
+    document.getElementById("command").value =
+      text.replace(/image banao|image bana|photo banao|picture banao/gi,"").trim();
+    generateImage();
+    return;
+  }
+  /* VIDEO */
+  if(
+    command.includes("video banao") ||
+    command.includes("video bana") ||
+    command.includes("video generate")
+  ){
+    generateVideo();
+    return;
+  }
+  /* RESEARCH */
+  if(
+    command.includes("research") ||
+    command.includes("research karo") ||
+    command.includes("jaankari nikalo")
+  ){
+    research();
+    return;
+  }
   /* FILE */
-
-  if(command.includes("file") ||
-     command.includes("video") ||
-     command.includes("photo")){
-
+  if(
+    command.includes("file") ||
+    command.includes("video edit") ||
+    command.includes("photo")
+  ){
     chooseFile();
-
     const reply =
       "📁 Boss, file select karo.";
-
     showReply(reply);
-
     speak(reply);
-
     return;
   }
-
-
-  /* GEMINI */
-
-  document.getElementById("reply").innerHTML =
-    "🤖 Rider soch raha hai...";
-
+  /* AI CHAT */
+  await askRider(text);
+}
+/* =========================
+   GEMINI CHAT
+========================= */
+async function askRider(text){
+  showReply("🤖 Rider soch raha hai...");
   try{
-
-    const response = await fetch(
-      "/.netlify/functions/chat",
-      {
+    const response =
+      await fetch("/.netlify/functions/chat",{
         method:"POST",
-
         headers:{
           "Content-Type":"application/json"
         },
-
         body:JSON.stringify({
           message:text
         })
-      }
-    );
-
+      });
     const data =
       await response.json();
-
     const reply =
       data.reply ||
       "🤖 Boss, reply nahi mila.";
-
     showReply(reply);
-
     speak(reply);
-
   }catch(error){
-
     showReply(
-      "❌ Boss, connection error aa gaya."
+      "❌ Boss, server connection error aa gaya."
     );
   }
 }
-
-
 /* =========================
-   DISPLAY REPLY
+   RESEARCH
 ========================= */
-
-function showReply(reply){
-
-  document.getElementById("reply").innerHTML =
-    reply;
-
-  const text =
-    document.getElementById("command").value;
-
-  document.getElementById("history").innerHTML =
-    "👤 " +
-    escapeHtml(text) +
-    "<br>🤖 " +
-    escapeHtml(reply);
+async function research(){
+  const input =
+    document.getElementById("command");
+  let query =
+    input.value.trim();
+  query =
+    query
+      .replace(/research karo/gi,"")
+      .replace(/research/gi,"")
+      .trim();
+  if(!query){
+    query =
+      prompt("Boss, kis topic par research karni hai?");
+    if(!query)
+      return;
+  }
+  showReply(
+    "🔎 Boss, research kar raha hoon..."
+  );
+  try{
+    const response =
+      await fetch("/.netlify/functions/research",{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          query:query
+        })
+      });
+    const data =
+      await response.json();
+    const reply =
+      data.reply ||
+      "❌ Research result nahi mila.";
+    showReply(reply);
+    speak(reply);
+  }catch(error){
+    showReply(
+      "❌ Research service available nahi hai."
+    );
+  }
 }
-
-
+/* =========================
+   IMAGE GENERATION
+========================= */
+async function generateImage(){
+  let prompt =
+    document.getElementById("command").value.trim();
+  if(!prompt){
+    prompt =
+      window.prompt(
+        "Boss, image kaisi chahiye?"
+      );
+    if(!prompt)
+      return;
+  }
+  showReply(
+    "🖼️ Boss, image generate kar raha hoon..."
+  );
+  try{
+    const response =
+      await fetch("/.netlify/functions/image",{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          prompt:prompt
+        })
+      });
+    const data =
+      await response.json();
+    if(data.image){
+      const preview =
+        document.getElementById("preview");
+      preview.src =
+        "data:image/png;base64," +
+        data.image;
+      preview.classList.remove("hidden");
+      showReply(
+        "🖼️ Boss, image ready hai."
+      );
+      speak(
+        "Boss, image ready hai."
+      );
+    }else{
+      showReply(
+        data.reply ||
+        "❌ Image generate nahi hui."
+      );
+    }
+  }catch(error){
+    showReply(
+      "❌ Image service error."
+    );
+  }
+}
+/* =========================
+   VIDEO GENERATION
+========================= */
+async function generateVideo(){
+  const prompt =
+    document.getElementById("command").value.trim();
+  if(!prompt){
+    showReply(
+      "🎬 Boss, pehle batao video kaisi banani hai."
+    );
+    return;
+  }
+  showReply(
+    "🎬 Boss, video generation request bhej raha hoon..."
+  );
+  try{
+    const response =
+      await fetch("/.netlify/functions/video",{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          prompt:prompt
+        })
+      });
+    const data =
+      await response.json();
+    showReply(
+      data.reply ||
+      "🎬 Video request process ho rahi hai."
+    );
+  }catch(error){
+    showReply(
+      "❌ Video generation service available nahi hai."
+    );
+  }
+}
 /* =========================
    VOICE OUTPUT
 ========================= */
-
 function speak(text){
-
   if(!("speechSynthesis" in window))
     return;
-
   speechSynthesis.cancel();
-
   const speech =
-    new SpeechSynthesisUtterance(text);
-
+    new SpeechSynthesisUtterance(
+      String(text).replace(/<[^>]*>/g," ")
+    );
   speech.lang = "hi-IN";
-  speech.rate = 0.95;
+  speech.rate = 0.92;
   speech.pitch = 1;
-
   speechSynthesis.speak(speech);
 }
-
-
 function speakRider(){
-
   speak(
-    "Hello Boss, main Rider AI hoon. Main aapki help ke liye ready hoon."
+    "Hello Boss! Main Rider AI hoon. Bataiye, main aapki kya madad kar sakta hoon?"
   );
 }
-
-
 /* =========================
-   OPEN WEBSITES
+   WEBSITES
 ========================= */
-
 function openYouTube(){
-
   window.open(
     "https://www.youtube.com",
     "_blank"
   );
 }
-
-
 function openGoogle(){
-
   window.open(
     "https://www.google.com",
     "_blank"
   );
 }
-
-
 /* =========================
-   FILE SELECT
+   FILE
 ========================= */
-
 function chooseFile(){
-
   document
     .getElementById("fileInput")
     .click();
 }
-
-
 function fileSelected(){
-
   const file =
-    document.getElementById("fileInput").files[0];
-
+    document
+      .getElementById("fileInput")
+      .files[0];
   if(!file)
     return;
-
-  const reply =
+  showReply(
     "📁 Boss, file select ho gayi: " +
-    file.name;
-
-  showReply(reply);
-
+    escapeHtml(file.name)
+  );
   speak(
     "Boss, file select ho gayi."
   );
+  if(file.type.startsWith("image/")){
+    const reader =
+      new FileReader();
+    reader.onload =
+      function(event){
+        const preview =
+          document.getElementById("preview");
+        preview.src =
+          event.target.result;
+        preview.classList.remove("hidden");
+      };
+    reader.readAsDataURL(file);
+  }
 }
-
-
 /* =========================
-   TIME DISPLAY
+   DISPLAY
 ========================= */
-
+function showReply(reply){
+  document.getElementById("reply").innerHTML =
+    reply;
+  const text =
+    document.getElementById("command").value;
+  document.getElementById("history").innerHTML =
+    "👤 " +
+    escapeHtml(text) +
+    "<br>🤖 " +
+    escapeHtml(
+      String(reply).replace(/<[^>]*>/g," ")
+    );
+}
+/* =========================
+   TIME
+========================= */
 function updateTime(){
-
   const now =
     new Date();
-
   document.getElementById("info").innerHTML =
     "🕒 " +
     now.toLocaleTimeString("en-IN");
 }
-
 setInterval(updateTime,1000);
-
 updateTime();
-
-
 /* =========================
    BATTERY
 ========================= */
-
 async function updateBattery(){
-
   if(!("getBattery" in navigator)){
-
     document.getElementById("battery").innerHTML =
       "🔋 Battery information unavailable";
-
     return;
   }
-
   try{
-
     const battery =
       await navigator.getBattery();
-
     function update(){
-
       document.getElementById("battery").innerHTML =
         "🔋 Battery: " +
-        Math.round(battery.level * 100) +
+        Math.round(
+          battery.level * 100
+        ) +
         "%";
     }
-
     update();
-
     battery.addEventListener(
       "levelchange",
       update
     );
-
   }catch(error){
-
     document.getElementById("battery").innerHTML =
       "🔋 Battery unavailable";
   }
 }
-
 updateBattery();
-
-
 /* =========================
    HTML SAFETY
 ========================= */
-
 function escapeHtml(text){
-
   return String(text)
     .replace(/&/g,"&amp;")
     .replace(/</g,"&lt;")
@@ -527,8 +619,6 @@ function escapeHtml(text){
     .replace(/"/g,"&quot;")
     .replace(/'/g,"&#039;");
 }
-
 </script>
-
 </body>
 </html>
